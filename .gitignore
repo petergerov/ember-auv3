@@ -1,0 +1,7 @@
+.idea/
+build/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+.DS_Store
+dist/
+toclone/

@@ -1,0 +1,18 @@
+#!/bin/sh
+# Registers the freshly installed Audio Unit extension so hosts see it without launching the app first.
+# Runs as root; registration is per user, so do it for the logged-in console user.
+
+APP="/Applications/Ember.app"
+APPEX="$APP/Contents/PlugIns/EmberExtension.appex"
+LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister"
+
+CONSOLE_USER=$(/usr/bin/stat -f %Su /dev/console)
+if [ -n "$CONSOLE_USER" ] && [ "$CONSOLE_USER" != "root" ] && [ "$CONSOLE_USER" != "loginwindow" ]; then
+    CONSOLE_UID=$(/usr/bin/id -u "$CONSOLE_USER")
+    /bin/launchctl asuser "$CONSOLE_UID" /usr/bin/sudo -u "$CONSOLE_USER" "$LSREGISTER" -f "$APP" || true
+    /bin/launchctl asuser "$CONSOLE_UID" /usr/bin/sudo -u "$CONSOLE_USER" /usr/bin/pluginkit -a "$APPEX" || true
+fi
+
+# Make the system Audio Unit cache rescan (it relaunches on demand).
+/usr/bin/killall -9 AudioComponentRegistrar >/dev/null 2>&1 || true
+exit 0
