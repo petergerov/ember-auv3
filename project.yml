@@ -1,6 +1,7 @@
+# ${BUNDLE_ID}, ${TEAM_ID} and ${ORGANIZATION} come from .env: generate with Scripts/generate-project.sh.
 name: Ember
 options:
-  bundleIdPrefix: com.gerov
+  bundleIdPrefix: ${ORGANIZATION}
   createIntermediateGroups: true
   deploymentTarget:
     macOS: "14.0"
@@ -18,7 +19,7 @@ settings:
     # macOS: sign to run locally. iOS devices: automatic signing with this team.
     CODE_SIGN_STYLE: Automatic
     CODE_SIGN_IDENTITY[sdk=macosx*]: "-"
-    DEVELOPMENT_TEAM[sdk=iphoneos*]: C9LBGZNZ6P
+    DEVELOPMENT_TEAM[sdk=iphoneos*]: "${TEAM_ID}"
 
 targets:
   Ember:
@@ -34,7 +35,7 @@ targets:
     settings:
       base:
         PRODUCT_NAME: Ember
-        PRODUCT_BUNDLE_IDENTIFIER: com.gerov.ember
+        PRODUCT_BUNDLE_IDENTIFIER: ${BUNDLE_ID}
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Ember
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.music
@@ -55,7 +56,7 @@ targets:
       base:
         PRODUCT_NAME: EmberExtension
         PRODUCT_MODULE_NAME: EmberExtension
-        PRODUCT_BUNDLE_IDENTIFIER: com.gerov.ember.audiounit
+        PRODUCT_BUNDLE_IDENTIFIER: ${BUNDLE_ID}.audiounit
         INFOPLIST_FILE: Extension/Info.plist
         SWIFT_OBJC_BRIDGING_HEADER: AudioUnit/Bridge/EmberExtension-Bridging-Header.h
         CODE_SIGN_ENTITLEMENTS[sdk=macosx*]: Extension/Extension.entitlements

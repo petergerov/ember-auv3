@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- __VERSION__ is substituted by Scripts/make-installer.sh -->
+<!-- __VERSION__, __BUNDLE_ID__ and __ORGANIZATION__ are substituted by Scripts/make-installer.sh -->
 <installer-gui-script minSpecVersion="2">
     <title>Ember __VERSION__</title>
-    <organization>com.gerov</organization>
+    <organization>__ORGANIZATION__</organization>
     <options customize="never" require-scripts="false" hostArchitectures="arm64,x86_64"/>
     <domains enable_localSystem="true" enable_anywhere="false" enable_currentUserHome="false"/>
     <volume-check>
@@ -14,12 +14,12 @@
     <conclusion file="conclusion.html" mime-type="text/html"/>
     <choices-outline>
         <line choice="default">
-            <line choice="com.gerov.ember"/>
+            <line choice="__BUNDLE_ID__"/>
         </line>
     </choices-outline>
     <choice id="default"/>
-    <choice id="com.gerov.ember" visible="false">
-        <pkg-ref id="com.gerov.ember"/>
+    <choice id="__BUNDLE_ID__" visible="false">
+        <pkg-ref id="__BUNDLE_ID__"/>
     </choice>
-    <pkg-ref id="com.gerov.ember" version="__VERSION__" onConclusion="none">Ember-component.pkg</pkg-ref>
+    <pkg-ref id="__BUNDLE_ID__" version="__VERSION__" onConclusion="none">Ember-component.pkg</pkg-ref>
 </installer-gui-script>

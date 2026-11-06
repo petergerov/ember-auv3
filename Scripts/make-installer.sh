@@ -4,16 +4,23 @@
 #   Scripts/make-installer.sh                                   # build + sign
 #   NOTARY_PROFILE=<keychain profile> Scripts/make-installer.sh # build + sign + notarize + staple
 #
+# Signing settings come from .env in the repo root (copy .env.example). Variables already set in
+# the environment take precedence over .env.
+#
 # Create a notary profile once with:
-#   xcrun notarytool store-credentials <profile> --apple-id <id> --team-id C9LBGZNZ6P --password <app-specific password>
+#   xcrun notarytool store-credentials <profile> --apple-id <id> --team-id <team-id> --password <app-specific password>
 set -euo pipefail
 
 ROOT="${0:A:h:h}"
 cd "$ROOT"
 
-TEAM="C9LBGZNZ6P"
-APP_IDENTITY="Developer ID Application: Petar Gerov ($TEAM)"
-PKG_IDENTITY="Developer ID Installer: Petar Gerov ($TEAM)"
+source Scripts/env.zsh
+require TEAM_ID
+require DEVELOPER_NAME
+
+TEAM="$TEAM_ID"
+APP_IDENTITY="${APP_IDENTITY:-Developer ID Application: $DEVELOPER_NAME ($TEAM)}"
+PKG_IDENTITY="${PKG_IDENTITY:-Developer ID Installer: $DEVELOPER_NAME ($TEAM)}"
 VERSION=$(awk '/MARKETING_VERSION:/ { print $2 }' project.yml)
 BUILD="build/release"
 STAGE="$BUILD/pkgroot"
@@ -30,7 +37,7 @@ step "Running DSP tests"
 Scripts/run-dsp-tests.sh | tail -1
 
 step "Building Ember $VERSION (Release, universal, Developer ID, hardened runtime)"
-xcodegen generate --quiet
+Scripts/generate-project.sh --quiet
 xcodebuild -project Ember.xcodeproj -scheme Ember_macOS -configuration Release \
     -destination 'generic/platform=macOS' -derivedDataPath "$BUILD/DerivedData" \
     ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO \
@@ -64,12 +71,13 @@ pkgbuild --root "$STAGE" \
     --component-plist "$BUILD/components.plist" \
     --install-location /Applications \
     --scripts Installer/scripts \
-    --identifier com.gerov.ember \
+    --identifier "$BUNDLE_ID" \
     --version "$VERSION" \
     "$BUILD/Ember-component.pkg" >/dev/null
 
 step "Building signed product archive"
-sed "s/__VERSION__/$VERSION/g" Installer/distribution.xml > "$BUILD/distribution.xml"
+sed -e "s/__VERSION__/$VERSION/g" -e "s/__BUNDLE_ID__/$BUNDLE_ID/g" -e "s/__ORGANIZATION__/$ORGANIZATION/g" \
+    Installer/distribution.xml > "$BUILD/distribution.xml"
 productbuild --distribution "$BUILD/distribution.xml" \
     --resources Installer/resources \
     --package-path "$BUILD" \

@@ -48,7 +48,8 @@ Tests/              Standalone DSP tests
 
 ```sh
 brew install xcodegen          # once
-xcodegen generate              # regenerate Ember.xcodeproj from project.yml
+cp .env.example .env           # once: fill in BUNDLE_ID (and TEAM_ID for iOS / installer)
+Scripts/generate-project.sh    # generate Ember.xcodeproj from project.yml + .env
 Scripts/run-dsp-tests.sh       # DSP tests (ceiling, true peak vs 16x reference, latency, transparency, match, bypass, mono, NaN safety)
 
 xcodebuild -scheme Ember_macOS -derivedDataPath build/DerivedData build
@@ -56,12 +57,15 @@ open build/DerivedData/Build/Products/Debug/Ember.app   # registers the extensio
 auval -v aufx Embr Grov
 ```
 
-iOS: open `Ember.xcodeproj`, pick the `Ember_iOS` scheme and run on a device (team `C9LBGZNZ6P`).
+iOS: open `Ember.xcodeproj`, pick the `Ember_iOS` scheme and run on a device with your development team.
 
 Keep parameter **identifiers** (`amount`, `input`, …) stable: AUv2-bridged hosts derive their
 parameter IDs from them, so renaming one breaks saved automation.
 
 ## Installer (macOS)
+
+The installer also needs `TEAM_ID` and `DEVELOPER_NAME` (the name on your Developer ID
+certificates) in `.env`.
 
 ```sh
 Scripts/make-installer.sh                                  # -> dist/Ember-<version>.pkg, signed
@@ -78,7 +82,7 @@ live in `Installer/`.
 Notarization needs a keychain profile, created once:
 
 ```sh
-xcrun notarytool store-credentials ember-notary --apple-id <apple-id> --team-id C9LBGZNZ6P
+xcrun notarytool store-credentials ember-notary --apple-id <apple-id> --team-id <team-id>
 ```
 
 iOS/iPadOS ships through TestFlight / the App Store (Xcode → Product → Archive), not a `.pkg`.
