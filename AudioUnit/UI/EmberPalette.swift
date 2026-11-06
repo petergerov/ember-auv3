@@ -1,26 +1,22 @@
 import SwiftUI
 
-/// Ember's fixed dark palette - a plugin editor keeps its own look regardless of system appearance.
+/// Fire colours for the glow and the sparks. They are the same in every panel finish:
+/// whatever the paint, an ember glows like an ember.
 enum EmberPalette {
-    static let backgroundTop = Color(red: 0.11, green: 0.095, blue: 0.095)
-    static let backgroundBottom = Color(red: 0.055, green: 0.05, blue: 0.055)
-    static let panel = Color.white.opacity(0.04)
-    static let panelStroke = Color.white.opacity(0.07)
-    static let track = Color.white.opacity(0.08)
-
     static let spark = Color(red: 1.0, green: 0.86, blue: 0.48)
     static let flame = Color(red: 1.0, green: 0.48, blue: 0.10)
     static let coal = Color(red: 0.84, green: 0.15, blue: 0.12)
 
-    static let text = Color(red: 0.93, green: 0.90, blue: 0.87)
-    static let mutedText = Color(red: 0.55, green: 0.51, blue: 0.48)
-
-    static let heat = LinearGradient(colors: [coal, flame, spark], startPoint: .leading, endPoint: .trailing)
-
-    /// Spark -> flame -> coal as `t` goes 0 -> 1 (precomputed so drawing never resolves colors).
+    /// Spark -> flame -> coal as `t` goes 0 -> 1 (precomputed so drawing never resolves colours).
     static func emberColor(_ t: Double) -> Color {
         let index = Int((min(max(t, 0), 1) * Double(emberRamp.count - 1)).rounded())
         return emberRamp[index]
+    }
+
+    /// The colour of something heated to `heat` (0...1): dull coal red when barely warm,
+    /// through orange, to pale yellow when white-hot.
+    static func glowColor(_ heat: Double) -> Color {
+        emberColor(1 - heat)
     }
 
     private static let emberRamp: [Color] = (0..<24).map { step in

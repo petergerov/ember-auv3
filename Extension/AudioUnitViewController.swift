@@ -24,7 +24,7 @@ public final class AudioUnitViewController: AUViewController, AUAudioUnitFactory
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-        preferredContentSize = CGSize(width: 560, height: 400)
+        preferredContentSize = CGSize(width: 620, height: 520)
         installEditorIfReady()
     }
 
